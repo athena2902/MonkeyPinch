@@ -33,7 +33,11 @@ import AVFoundation
 
 class ViewController: UIViewController {
     
-    var chompPlayer:AVAudioPlayer? = nil
+    var chompPlayer: AVAudioPlayer? = nil
+    @IBOutlet var monkeyPan: UIPanGestureRecognizer!
+    @IBOutlet var bananaPan: UIPanGestureRecognizer!
+    
+    var hehePlayer: AVAudioPlayer? = nil
     
     func loadSound(filename: String) -> AVAudioPlayer {
         let url = Bundle.main.url(forResource: filename, withExtension: "caf")
@@ -55,8 +59,16 @@ class ViewController: UIViewController {
             let recognizer = UITapGestureRecognizer(target: self, action:#selector(handleTap(recognizer:)))
             recognizer.delegate = self
             view.addGestureRecognizer(recognizer)
+            
+            recognizer.require(toFail: monkeyPan)
+            recognizer.require(toFail: bananaPan)
+            
+            let tickleRecognizer = TickleGestureRecognizer(target: self, action:#selector(handleTickle(recognizer:)))
+            tickleRecognizer.delegate = self
+            view.addGestureRecognizer(tickleRecognizer)
         }
         self.chompPlayer = self.loadSound(filename: "chomp")
+        self.hehePlayer = self.loadSound(filename: "hehehe1")
     }
     
     @IBAction func handlePinch(recognizer : UIPinchGestureRecognizer) {
@@ -88,7 +100,6 @@ class ViewController: UIViewController {
             let velocity = recognizer.velocity(in: self.view)
             let magnitude = sqrt(velocity.x * velocity.x + velocity.y * velocity.y)
             let slideMultiplier = magnitude/200
-            print("magnitude: \(magnitude), slideMultiplier: \(slideMultiplier)")
             
             let slideFactor = 0.1 * slideMultiplier
             
@@ -102,6 +113,10 @@ class ViewController: UIViewController {
                            animations: {recognizer.view!.center = finalPoint },
                            completion: nil)
         }
+    }
+    
+    @objc func handleTickle(recognizer: TickleGestureRecognizer) {
+        self.hehePlayer?.play()
     }
 }
 
